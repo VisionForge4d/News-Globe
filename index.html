@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>News Globe</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div id="app">
+    <div id="viewport">
+      <div id="crosshair" aria-hidden="true"></div>
+      <canvas id="c"></canvas>
+    </div>
+
+    <aside id="panel">
+      <div class="panel-header">
+        <div>
+          <div id="place" class="place">—</div>
+          <div id="meta" class="meta">—</div>
+        </div>
+        <button id="openTop" class="btn">Open Top 5</button>
+      </div>
+
+      <div id="groups" class="groups"></div>
+
+      <div class="footer">
+        <input id="search" class="search" placeholder="Search station (DRC, Haiti, NZ…)" />
+        <button id="random" class="btn ghost">Random</button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Three.js (module) -->
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
