@@ -35,8 +35,6 @@ const texLoader = new THREE.TextureLoader();
 const earthColor = texLoader.load("https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg");
 const earthBump = texLoader.load("https://threejs.org/examples/textures/planets/earth_bump_2048.jpg");
 const earthSpec = texLoader.load("https://threejs.org/examples/textures/planets/earth_specular_2048.jpg");
-const cloudAlpha = texLoader.load("https://threejs.org/examples/textures/planets/earth_clouds_1024.png");
-
 earthColor.colorSpace = THREE.SRGBColorSpace;
 
 const globe = new THREE.Mesh(
@@ -52,23 +50,7 @@ const globe = new THREE.Mesh(
 );
 scene.add(globe);
 
-const wireframeOverlay = new THREE.Mesh(
-  globe.geometry,
-  new THREE.MeshBasicMaterial({ color: 0x93d6ff, wireframe: true, transparent: true, opacity: 0.14 })
-);
-wireframeOverlay.scale.setScalar(1.001);
-globe.add(wireframeOverlay);
 
-const cloudLayer = new THREE.Mesh(
-  new THREE.SphereGeometry(R * 1.012, 64, 64),
-  new THREE.MeshPhongMaterial({
-    alphaMap: cloudAlpha,
-    transparent: true,
-    opacity: 0.35,
-    depthWrite: false
-  })
-);
-scene.add(cloudLayer);
 
 const atmosphere = new THREE.Mesh(
   new THREE.SphereGeometry(R * 1.04, 64, 64),
@@ -240,8 +222,6 @@ randomBtn.addEventListener("click", () => {
 function animate() {
   resizeIfNeeded();
   controls.update();
-  cloudLayer.rotation.y += 0.00045;
-
   camera.getWorldDirection(forward);
   raycaster.set(camera.position, forward);
 
