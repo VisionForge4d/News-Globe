@@ -12,6 +12,7 @@ const randomBtn = document.querySelector("#random");
 
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
 
 const scene = new THREE.Scene();
 
@@ -24,17 +25,56 @@ controls.enablePan = false;
 controls.minDistance = 1.8;
 controls.maxDistance = 6.0;
 
-scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+scene.add(new THREE.AmbientLight(0xffffff, 0.3));
 const dir = new THREE.DirectionalLight(0xffffff, 1.2);
 dir.position.set(5, 2, 5);
 scene.add(dir);
 
 const R = 1;
+const texLoader = new THREE.TextureLoader();
+const earthColor = texLoader.load("https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg");
+const earthBump = texLoader.load("https://threejs.org/examples/textures/planets/earth_bump_2048.jpg");
+const earthSpec = texLoader.load("https://threejs.org/examples/textures/planets/earth_specular_2048.jpg");
+const cloudAlpha = texLoader.load("https://threejs.org/examples/textures/planets/earth_clouds_1024.png");
+
+earthColor.colorSpace = THREE.SRGBColorSpace;
+
 const globe = new THREE.Mesh(
   new THREE.SphereGeometry(R, 64, 64),
-  new THREE.MeshBasicMaterial({ color: 0x44aa88, wireframe: true }) // DEBUG MATERIAL
+  new THREE.MeshPhongMaterial({
+    map: earthColor,
+    bumpMap: earthBump,
+    bumpScale: 0.035,
+    specularMap: earthSpec,
+    specular: new THREE.Color(0x223344),
+    shininess: 20
+  })
 );
 scene.add(globe);
+
+const wireframeOverlay = new THREE.Mesh(
+  globe.geometry,
+  new THREE.MeshBasicMaterial({ color: 0x93d6ff, wireframe: true, transparent: true, opacity: 0.14 })
+);
+wireframeOverlay.scale.setScalar(1.001);
+globe.add(wireframeOverlay);
+
+const cloudLayer = new THREE.Mesh(
+  new THREE.SphereGeometry(R * 1.012, 64, 64),
+  new THREE.MeshPhongMaterial({
+    alphaMap: cloudAlpha,
+    transparent: true,
+    opacity: 0.35,
+    depthWrite: false
+  })
+);
+scene.add(cloudLayer);
+
+const atmosphere = new THREE.Mesh(
+  new THREE.SphereGeometry(R * 1.04, 64, 64),
+  new THREE.MeshBasicMaterial({ color: 0x3d8eff, transparent: true, opacity: 0.06, side: THREE.BackSide })
+);
+scene.add(atmosphere);
 const stationGroup = new THREE.Group();
 scene.add(stationGroup);
 
@@ -200,6 +240,7 @@ randomBtn.addEventListener("click", () => {
 function animate() {
   resizeIfNeeded();
   controls.update();
+  cloudLayer.rotation.y += 0.00045;
 
   camera.getWorldDirection(forward);
   raycaster.set(camera.position, forward);
