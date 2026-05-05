@@ -123,7 +123,9 @@ function resizeIfNeeded() {
 function vecToLatLon(v) {
   const p = v.clone().normalize();
   const lat = THREE.MathUtils.radToDeg(Math.asin(p.y));
-  const lon = THREE.MathUtils.radToDeg(Math.atan2(p.z, p.x));
+  // Inverse mapping must mirror latLonToVector3
+  // (z is negated there to align Earth texture orientation).
+  const lon = THREE.MathUtils.radToDeg(Math.atan2(-p.z, p.x));
   return { lat, lon };
 }
 

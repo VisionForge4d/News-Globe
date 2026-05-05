@@ -221,3 +221,27 @@ From `package.json`:
 Currently marked as **ISC** in `package.json`.
 
 If you plan to publish/distribute, consider adding explicit attribution and a content curation policy for external links.
+
+
+## Geolocation accuracy plan
+
+### Current evaluation
+- Station latitude/longitude values in `stations.js` are plausible city coordinates.
+- Pin-to-globe projection (`latLonToVector3`) is consistent, but inverse cursor readback (`vecToLatLon`) previously mirrored longitude east/west, causing perceived mismatches between pins and real Earth geography.
+
+### Implementation plan
+1. **Fix coordinate inverse math**
+   - Keep `latLonToVector3` as-is and compute longitude with `atan2(-z, x)` in `vecToLatLon` (implemented).
+2. **Add data validation for stations**
+   - Add a startup check that each station has `lat ∈ [-90, 90]` and `lon ∈ [-180, 180]`; warn in console for outliers.
+3. **Add visual QA mode**
+   - Optional debug toggle to render lat/lon grid lines and show selected station raw coordinates in-panel.
+4. **Automate regression tests**
+   - Add pure JS tests for round-trip conversions: `lat/lon -> vec -> lat/lon` within tolerance.
+5. **Curate authoritative coordinates**
+   - Move city coordinates to a dedicated JSON source with provenance notes, then lint on CI.
+
+### Acceptance criteria
+- Pin sits on expected city region (manual QA for every station).
+- Round-trip conversion error <= 0.1° for test fixtures.
+- Nearest-station readout no longer shows systematic east/west inversions.
